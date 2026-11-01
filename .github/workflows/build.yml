@@ -11,16 +11,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Accept SDK Licenses
+      - name: Build APK Without Interactive Prompts
+        working-directory: ./launcher
         run: |
           mkdir -p $ANDROID_SDK_ROOT/licenses
           echo "24333f8a43b681623c25cf150ef94828f4a3f3ac" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
           echo "d56f5187479451eabf01fb78af6dfcb131a648af" >> $ANDROID_SDK_ROOT/licenses/android-sdk-license
           echo "84831b9409646fa914e39578fff42faef15d6f1d" >> $ANDROID_SDK_ROOT/licenses/android-sdk-license
-      - uses: android-actions/setup-android@v3
-      - name: Build APK
-        working-directory: ./launcher
-        run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
       - uses: softprops/action-gh-release@v2
