@@ -12,8 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public final class LiquidGlassLockEngine {
-    private static final long FRAME_MS = 33L; // Strict 30 FPS pacing for Mi TV 4A Pro (1GB RAM)
-    private static final long IDLE_MS = 180000L; // 3 minutes idle auto-lock
+    private static final long FRAME_MS = 33L;
+    private static final long IDLE_MS = 180000L;
     private static LiquidGlassLockEngine inst;
     private final Activity act;
     private final Handler h = new Handler(Looper.getMainLooper());
@@ -24,9 +24,12 @@ public final class LiquidGlassLockEngine {
     private int curPeriod = -1;
     private View lastFocus;
     private final WeakHashMap<View, Boolean> styled = new WeakHashMap<>();
-    private final Runnable idleTask = () -> { if (!locked && !act.isFinishing()) animateLock(true); };
+    private final Runnable idleTask;
 
-    private LiquidGlassLockEngine(Activity a) { this.act = a; }
+    private LiquidGlassLockEngine(Activity a) {
+        this.act = a;
+        this.idleTask = () -> { if (!locked && !act.isFinishing()) animateLock(true); };
+    }
 
     public static void attach(Activity a) {
         inst = new LiquidGlassLockEngine(a);
@@ -171,33 +174,6 @@ public final class LiquidGlassLockEngine {
         };
         p.setShader(new LinearGradient(0, 0, 0, H, skies[mode], null, Shader.TileMode.CLAMP));
         c.drawRect(0, 0, W, H, p);
-
-        int[] orbX = {920, 640, 380, 980, 320};
-        int[] orbY = {400, 160, 430, 190, 220};
-        int[] orbCol = {0xCCFFEBAA, 0x99FFFFFF, 0xCCFFA550, 0x8820D2A5, 0x883880FF};
-        p.setShader(new RadialGradient(orbX[mode], orbY[mode], 340, orbCol[mode], 0x00000000, Shader.TileMode.CLAMP));
-        c.drawRect(0, 0, W, H, p);
-
-        if (mode == 4) {
-            p.setShader(new RadialGradient(980, 260, 360, 0x80A840FF, 0x00000000, Shader.TileMode.CLAMP));
-            c.drawRect(0, 0, W, H, p);
-            return bmp;
-        }
-        int[] mCols = {0xCC281E44, 0xE618122C, 0xFF0E0A1C};
-        for (int r = 0; r < 3; r++) {
-            Path path = new Path();
-            float base = H * (0.66f + r * 0.09f);
-            path.moveTo(0, H);
-            for (int x = 0; x <= W; x += 64) {
-                float y = base + (float)Math.sin(x * 0.006 + r * 2.1 + mode) * (38 - r * 8);
-                path.lineTo(x, y);
-            }
-            path.lineTo(W, H);
-            path.close();
-            p.setShader(null);
-            p.setColor(mCols[r]);
-            c.drawPath(path, p);
-        }
         return bmp;
     }
 
