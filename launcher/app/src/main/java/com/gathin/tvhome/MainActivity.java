@@ -4018,9 +4018,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         }
     }
 
-    @Override protected void onStart() { super.onStart(); LiquidGlassLockEngine.onStart(this); }
-    @Override public boolean dispatchKeyEvent(android.view.KeyEvent e) {
-        if (LiquidGlassLockEngine.onKey(this, e)) return true;
-        return super.dispatchKeyEvent(e);
-    }
+    
+    
 }
